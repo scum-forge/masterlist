@@ -6,7 +6,9 @@ export interface RawServerInfo
 	playersCount: number;
 	maxPlayers: number;
 	timeHour: number;
-	unk: string;
+	unk1: string;
+	passwordByte: number;
+	unk2: string;
 	versionBuild: number;
 	versionPatch: number;
 	versionMinor: number;

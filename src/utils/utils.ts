@@ -14,7 +14,9 @@ export function parseServerInfo(rawData: Buffer): ServerInfo
 		playersCount,
 		maxPlayers,
 		timeHour,
-		unk,
+		unk1,
+		passwordByte,
+		unk2,
 		versionBuild,
 		versionPatch,
 		versionMinor,
@@ -28,7 +30,9 @@ export function parseServerInfo(rawData: Buffer): ServerInfo
 		playersCount: playersCount as number,
 		maxPlayers: maxPlayers as number,
 		timeHour: timeHour as number,
-		unk: unk as string,
+		unk1: unk1 as string,
+		passwordByte: passwordByte as number,
+		unk2: unk2 as string,
 		versionBuild: versionBuild as number,
 		versionPatch: versionPatch as number,
 		versionMinor: versionMinor as number,
@@ -43,6 +47,7 @@ export function prettifyServerInfo(info: ServerInfo)
 		name: info.name,
 		players: `${info.playersCount}/${info.maxPlayers}`,
 		time: `${info.timeHour.toString().padStart(2, '0')}:00`,
+		hasPassword: ((info.passwordByte >> 1) & 1) === 1, // eslint-disable-line no-bitwise
 		version: `${info.versionMajor}.${info.versionMinor}.${info.versionPatch}.${info.versionBuild}`,
 	};
 }
