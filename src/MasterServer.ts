@@ -1,5 +1,4 @@
 import { Socket } from 'node:net';
-import { sizeOf, unpack } from 'python-struct';
 import { constants } from './utils/constants';
 import type { MasterListCache, ServerInfo } from './utils/types';
 import { parseServerInfo } from './utils/utils';
@@ -80,19 +79,15 @@ export class MasterServer
 	async getServers(updateCache = true)
 	{
 		this.fetchInfo();
+
 		const rawData = Buffer.concat(await this.readAll());
-
-		// parse servers count
-		const numServers = unpack('<H', rawData)[0] as number;
-
-		// initialize
+		const numServers = rawData.readUIntLE(0, 2); // first two bytes are servers count
 		const serverList = new Map<string, ServerInfo>();
-		const serverData = rawData.slice(sizeOf('<H'));
 
 		// parse raw data
-		for (let i = 0; i < serverData.length; i += constants.serverInfo.size)
+		for (let i = 2; i < rawData.length; i += constants.serverInfo.SIZE) // starts in 2 so we skip servers count
 		{
-			const raw = serverData.slice(i, i + constants.serverInfo.size);
+			const raw = rawData.slice(i, i + constants.serverInfo.SIZE);
 			const info = parseServerInfo(raw);
 
 			serverList.set(`${info.ip}:${info.port}`, info);

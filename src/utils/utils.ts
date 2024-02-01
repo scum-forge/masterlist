@@ -1,42 +1,28 @@
-import { unpack } from 'python-struct';
 import { constants } from './constants';
-import type { ServerInfo } from './types';
+import type { RawServerInfo, ServerInfo } from './types';
 
 // eslint-disable-next-line no-bitwise
 export const ipFromLong = (ip: number) => `${ip >>> 24}.${(ip >> 16) & 255}.${(ip >> 8) & 255}.${ip & 255}`;
 
 export function parseServerInfo(rawData: Buffer): ServerInfo
 {
-	const [
-		ip,
-		port,
-		nameBuffer,
-		playersCount,
-		maxPlayers,
-		timeHour,
-		unk1,
-		passwordByte,
-		unk2,
-		versionBuild,
-		versionPatch,
-		versionMinor,
-		versionMajor,
-	] = unpack(constants.serverInfo.format, rawData);
+	const ctx = constants.serverInfo.readContext(rawData, 0, {});
+	const data = ctx.data as RawServerInfo;
 
 	return {
-		ip: ipFromLong(ip as number),
-		port: port as number,
-		name: (nameBuffer as unknown as Buffer).toString('latin1').replace(/\0+$/, ''),
-		playersCount: playersCount as number,
-		maxPlayers: maxPlayers as number,
-		timeHour: timeHour as number,
-		unk1: unk1 as string,
-		passwordByte: passwordByte as number,
-		unk2: unk2 as string,
-		versionBuild: versionBuild as number,
-		versionPatch: versionPatch as number,
-		versionMinor: versionMinor as number,
-		versionMajor: versionMajor as number,
+		ip: ipFromLong(data.ip),
+		port: data.port,
+		name: data.name.replace(/\0+$/, ''),
+		playersCount: data.playersCount,
+		maxPlayers: data.maxPlayers,
+		timeHour: data.timeHour,
+		unknown1: data.unknown1,
+		passwordByte: data.passwordByte,
+		unknown2: data.unknown2,
+		versionBuild: data.versionBuild,
+		versionPatch: data.versionPatch,
+		versionMinor: data.versionMinor,
+		versionMajor: data.versionMajor,
 	};
 }
 
